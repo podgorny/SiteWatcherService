@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+ 		http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+ 		http://www.springframework.org/schema/context
+ 		http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+>
+    <context:annotation-config/>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:/spring/springProp.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="false"/>
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+    </bean>
+
+    <bean id="cacheEnabled"
+          class="java.lang.Boolean">
+        <constructor-arg type="java.lang.String" value="#{${dbCacheEnabled} == 1 ? 'TRUE' : 'FALSE'}"/>
+    </bean>
+
+    <util:list id="initSQL"
+               value-type="java.lang.String">
+        <value>${dbSQLInitCreateDB}</value>
+        <value>${dbSQLInitUserCreate}</value>
+        <value>${dbSQLInitUserGrants}</value>
+        <value>${dbSQLInitTableContentCreate}</value>
+        <value>${dbSQLInitTableContentIndex}</value>
+        <value>${dbSQLInitTableCategoryCreate}</value>
+        <value>${dbSQLInitTableCategoryIndex}</value>
+        <value>${dbSQLInitTableTitleCreate}</value>
+        <value>${dbSQLInitTableTitleIndex}</value>
+        <value>${dbSQLInitTableSiteCreate}</value>
+        <value>${dbSQLInitTableSiteIndex}</value>
+        <value>${dbSQLInitTableArticleCreate}</value>
+        <value>${dbSQLInitTableArticleIndex}</value>
+        <value>${dbSQLInitTableArticleIndexURL}</value>
+        <value>${dbSQLInitTableArticleForeignCategory}</value>
+        <value>${dbSQLInitTableArticleForeignTitle}</value>
+        <value>${dbSQLInitTableArticleForeignContent}</value>
+        <value>${dbSQLInitTableArticleHistoryCreate}</value>
+        <value>${dbSQLInitTableArticleHistoryIndex}</value>
+        <value>${dbSQLInitTableArticleHistoryForeignArticle}</value>
+        <value>${dbSQLInitTableArticleHistoryForeignContent}</value>
+        <value>${dbSQLInitTableArticleHistoryForeignCategory}</value>
+        <value>${dbSQLInitTableArticleHistoryForeignTitle}</value>
+        <value>${dbSQLInitTableArticleForeignSite}</value>
+    </util:list>
+
+    <bean id="sqlFetchByEntity"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlGetAll} + ' ' + ${sqlWhereNAMEClause}}"/>
+    </bean>
+    <bean id="sqlFetchByEntityContent"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlGetAll} + ' ' + ${sqlWhereContentClause}}"/>
+    </bean>
+    <bean id="sqlFetchBySite"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlGetAll} + ' ' + ${sqlWhereURLClause}}"/>
+    </bean>
+    <bean id="sqlFetchByEntityArticle"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlGetAllArticle} + ' ' + ${sqlWhereArticleURLClause}}"/>
+    </bean>
+    <bean id="sqlGetAll"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlGetAll}}"/>
+    </bean>
+    <bean id="sqlGetAllArticle"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlGetAllArticle}}"/>
+    </bean>
+    <bean id="sqlFetchById"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlGetAll} + ' ' + ${sqlWhereIDClause}}"/>
+    </bean>
+    <bean id="sqlFetchArticleById"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlGetAllArticle} + ' ' + ${sqlWhereArticleIDClause}}"/>
+    </bean>
+    <bean id="sqlFetchArticleRevision"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlFetchArticleRevision}}"/>
+    </bean>
+
+    <bean id="sqlInsert"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlInsertEntity}}"/>
+    </bean>
+    <bean id="sqlInsertSite"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlInsertSite}}"/>
+    </bean>
+    <bean id="sqlInsertContent"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlInsertContent}}"/>
+    </bean>
+    <bean id="sqlInsertArticle"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlInsertArticle}}"/>
+    </bean>
+    <bean id="sqlInsertNewRevision"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlInsertNewRevision}}"/>
+    </bean>
+    <bean id="sqlDeleteAll"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlDeleteAll}}"/>
+    </bean>
+    <bean id="sqlDeleteByID"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlDeleteAll} + ' ' + ${sqlWhereIDClause}}"/>
+    </bean>
+    <bean id="sqlDeleteByEntity"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlDeleteAll} + ' ' + ${sqlWhereNAMEClause}}"/>
+    </bean>
+    <bean id="sqlDeleteBySite"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlDeleteAll} + ' ' + ${sqlWhereURLClause}}"/>
+    </bean>
+    <bean id="sqlDeleteByEntityContent"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlDeleteAll} + ' ' + ${sqlWhereContentClause}}"/>
+    </bean>
+    <bean id="sqlDeleteByEntityArticle"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlDeleteAll} + ' ' + ${sqlWhereURLClause}}"/>
+    </bean>
+    <bean id="sqlUpdateArticle"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlUpdateArticle}}"/>
+    </bean>
+    <bean id="sqlFetchAllArticleRevisions"
+          class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="#{${sqlFetchAllArticleRevisions}}"/>
+    </bean>
+
+
+<!--!!!!!!!!!!!!!!!!!! HABRABABR.RU !!!!!!!!!!!!!!!!!!!!-->
+    <bean id="habrahabrURL"
+          class="java.net.URL">
+        <constructor-arg type="java.lang.String" value="https://habrahabr.ru/all"/>
+    </bean>
+    <bean id="habrahabrCategorySelector"
+          class="it.devchallange.podgorny.http.impl.SelectorImpl">
+        <constructor-arg name="domName" value="div"/>
+        <constructor-arg name="cssSelector" value=".post__header > h2.post__title > a.post__flow"/>
+    </bean>
+    <bean id="habrahabrTitleSelector"
+          class="it.devchallange.podgorny.http.impl.SelectorImpl">
+        <constructor-arg name="domName" value="div"/>
+        <constructor-arg name="cssSelector" value=".post__header > h2.post__title > a.post__title_link"/>
+    </bean>
+    <bean id="habrahabrContentSelector"
+          class="it.devchallange.podgorny.http.impl.SelectorImpl">
+        <constructor-arg name="domName" value="div"/>
+        <constructor-arg name="cssSelector" value=".post__body_full > div.content"/>
+    </bean>
+    <bean id="habrahabrNextPageSelector"
+          class="it.devchallange.podgorny.http.impl.SelectorImpl">
+        <constructor-arg name="domName" value="div"/>
+        <constructor-arg name="cssSelector" value=".posts_list > div.page__footer > ul.arrows-pagination > li.arrows-pagination__item > a#next_page"/>
+    </bean>
+
+    <bean id="habrahabrSite"
+          class="it.devchallange.podgorny.entity.Site">
+        <constructor-arg name="name" value="Habr"/>
+        <constructor-arg name="url" ref="habrahabrURL"/>
+        <constructor-arg name="replacements">
+            <map>
+                <entry key="/all/all/page" value="/all/page"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="habrahabrDataGrabber"
+          class="it.devchallange.podgorny.http.impl.SimpleSiteDataGrabberImpl">
+        <constructor-arg name="nextPageSelector" ref="habrahabrNextPageSelector"/>
+        <constructor-arg name="categorySelector" ref="habrahabrCategorySelector"/>
+        <constructor-arg name="titleSelector" ref="habrahabrTitleSelector"/>
+        <constructor-arg name="contentSelector" ref="habrahabrContentSelector"/>
+    </bean>
+</beans>

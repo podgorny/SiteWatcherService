@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+ 		http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+ 		http://www.springframework.org/schema/context
+ 		http://www.springframework.org/schema/context/spring-context.xsd"
+>
+    <context:annotation-config/>
+
+    <import resource="CustomTypes.xml"/>
+
+    <bean id="decoder"
+          class="it.devchallange.podgorny.utils.DecoderImpl"/>
+
+    <bean id="dbUtil"
+          class="it.devchallange.podgorny.dao.jdbc.utils.DBUtil">
+    </bean>
+
+    <bean id="dbCache"
+          class="it.devchallange.podgorny.dao.jdbc.utils.DBCache">
+    </bean>
+
+    <bean id="contentComparator"
+          class="it.devchallange.podgorny.utils.ContentComparatorImpl">
+    </bean>
+
+    <bean id="rootDS"
+          class="com.jolbox.bonecp.BoneCPDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="com.mysql.jdbc.Driver" />
+        <property name="jdbcUrl" value="${rootConnectionString}"/>
+        <property name="username" value="${rootUserName}"/>
+        <property name="password" value="${rootUserPassword}"/>
+        <property name="maxConnectionsPerPartition" value="${rootMaxConnectionLimit}"/>
+        <property name="minConnectionsPerPartition" value="${rootMinConnectionLimit}"/>
+        <property name="partitionCount" value="${rootPartitionCount}"/>
+        <property name="acquireIncrement" value="${rootAcquireIncrement}"/>
+        <property name="statementsCacheSize" value="${rootStatementsCacheSize}"/>
+    </bean>
+
+    <bean id="regularDS"
+          class="com.jolbox.bonecp.BoneCPDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="com.mysql.jdbc.Driver" />
+        <property name="jdbcUrl" value="${regularConnectionString}" />
+        <property name="username" value="${regularUserName}"/>
+        <property name="password" value="${regularUserPassword}"/>
+        <property name="maxConnectionsPerPartition" value="${regularMaxConnectionLimit}"/>
+        <property name="minConnectionsPerPartition" value="${regularMinConnectionLimit}"/>
+        <property name="partitionCount" value="${regularPartitionCount}"/>
+        <property name="acquireIncrement" value="${regularAcquireIncrement}"/>
+        <property name="statementsCacheSize" value="${regularStatementsCacheSize}"/>
+    </bean>
+
+    <bean id="titleDAOJDBC"
+          class="it.devchallange.podgorny.dao.jdbc.impl.TitleDAOJDBCImpl">
+    </bean>
+
+    <bean id="siteDAOJDBC"
+          class="it.devchallange.podgorny.dao.jdbc.impl.SiteDAOJDBCImpl">
+    </bean>
+
+    <bean id="categoryDAOJDBC"
+          class="it.devchallange.podgorny.dao.jdbc.impl.CategoryDAOJDBCImpl">
+    </bean>
+
+    <bean id="articleDAOJDBC"
+          class="it.devchallange.podgorny.dao.jdbc.impl.ArticleDAOJDBCImpl">
+    </bean>
+
+    <bean id="contentDAOJDBC"
+          class="it.devchallange.podgorny.dao.jdbc.impl.ContentDAOJDBCImpl">
+    </bean>
+
+    <bean id="siteReader"
+          class="it.devchallange.podgorny.http.impl.SimpleSiteProcessorImpl">
+        <constructor-arg name="grabberMap">
+            <map>
+                <entry key-ref="habrahabrSite" value-ref="habrahabrDataGrabber"/>
+            </map>
+        </constructor-arg>
+        <constructor-arg name="delayBetweenGrabNext" value="10000"/>
+    </bean>
+</beans>

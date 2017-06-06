@@ -1,0 +1,48 @@
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5"
+         metadata-complete="false">
+    <display-name>Restful Web Application</display-name>
+
+
+<!-- ################## SERVLET DEFINE ################## -->
+    <!--  ROOT -->
+    <servlet>
+        <servlet-name>spring</servlet-name>
+        <servlet-class>
+            org.springframework.web.servlet.DispatcherServlet
+        </servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath*:spring/ServletConfigurtion.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <!--  WELCOME PAGE -->
+    <servlet>
+        <servlet-name>HiThere</servlet-name>
+        <servlet-class>it.devchallange.podgorny.http.Hithere</servlet-class>
+    </servlet>
+
+<!-- ################## MAPPING ################## -->
+    <!--  ROOT -->
+    <servlet-mapping>
+        <servlet-name>spring</servlet-name>
+        <url-pattern>/rest/v1/*</url-pattern>
+    </servlet-mapping>
+    <!--  WELCOME PAGE -->
+    <servlet-mapping>
+        <servlet-name>HiThere</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath*:spring/ServletConfigurtion.xml</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+</web-app>
