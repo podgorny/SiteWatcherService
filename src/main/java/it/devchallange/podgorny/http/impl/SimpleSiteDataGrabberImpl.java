@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.util.*;
 
 public class SimpleSiteDataGrabberImpl implements SimpleSiteDataGrabber {
@@ -48,9 +49,9 @@ public class SimpleSiteDataGrabberImpl implements SimpleSiteDataGrabber {
     public List<Article> grab(Site site, long delayBetweenNext) {
         this.delayBetweenNext = delayBetweenNext;
         rootURL = site.getURLString();
-        logger.info("Start grabbing site : " + site);
+        logger.info("Start grabbing articles from: " + site);
         List<Article> articleList = getArticleListWithoutContent(site);
-        logger.info("Processing page: " + site.getURLString() + "; total articles on page " + articleList.size());
+        logger.info("Processing page articles for: " + site.getURLString() + "; total articles on page " + articleList.size());
         try {
             articleList = processFetchedPageData(site, articleList, false);
         } catch (MalformedURLException e) {
@@ -68,12 +69,17 @@ public class SimpleSiteDataGrabberImpl implements SimpleSiteDataGrabber {
         pageElements = doc.select(nextPageSelector.getDOMName() + nextPageSelector.getCSSSelector());
         pageElement = pageElements.first();
 
+        logger.info("page selector is {" + nextPageSelector.getDOMName() + nextPageSelector.getCSSSelector() + "}");
+        logger.info("rootURL : " + rootURL);
+        logger.info("next page: " + pageElement.attr("href"));
+
         if (logger.isDebugEnabled()){
             logger.debug("page selector is {" + nextPageSelector.getDOMName() + nextPageSelector.getCSSSelector() + "}");
-            logger.debug("next page: " + rootURL + pageElement.attr("href"));
+            logger.debug("rootURL : " + rootURL);
+            logger.debug("next page: " + pageElement.attr("href"));
         }
 //            return new SimpleSiteImpl(new URL(mainURL + pageElement.attr("href")), site.getReplacementMap());
-            return new Site(site.getName(), rootURL + pageElement.attr("href"));
+            return new Site(site.getName(), site.getURLString() + pageElement.attr("href"), site.getReplacementMap());
     }
     private void waitForNextIteration() {
         try {
@@ -87,7 +93,8 @@ public class SimpleSiteDataGrabberImpl implements SimpleSiteDataGrabber {
     private List<Article> processFetchedPageData(Site site, List<Article> articleListWithoutContent, boolean fetchImages) throws MalformedURLException {
         List<Article> articleList = new ArrayList<>();
         for (Article article : articleListWithoutContent){
-            Content content = getContentByArticle(new Site(site.getName(), article.getURL()), article, false);
+            if (logger.isDebugEnabled()) logger.debug("Fetching content for article:" + article.getURL());
+            Content content = getContentByArticle(new Site(site.getName(), article.getURL(), site.getReplacementMap()), false);
             if (content != null){
                 article.setContent(content);
                 articleList.add(article);
@@ -97,7 +104,7 @@ public class SimpleSiteDataGrabberImpl implements SimpleSiteDataGrabber {
         return articleList;
     }
 
-    private Content getContentByArticle(Site site, Article article, boolean fetchImages) throws MalformedURLException {
+    private Content getContentByArticle(Site site, boolean fetchImages) throws MalformedURLException {
         Document doc = getDocument(site);
 
         Elements contentElemtnt;
@@ -149,22 +156,26 @@ public class SimpleSiteDataGrabberImpl implements SimpleSiteDataGrabber {
     }
 
     private Document getDocument(Site site)  {
+        doc = null;
         if (siteDocumentMap.containsKey(site)){
             return siteDocumentMap.get(site);
         }
-        try {
-            logger.info("Initialize doc for : " + site.getUrl());
-            doc = Jsoup.connect(site.getURLString()).get();
-            siteDocumentMap.put((Site) site, doc);
-        } catch (IOException e) {
-            logger.error(e);
-        }
-        if (doc == null){
-            logger.error("Document initialization failde");
-            return null;
-        }
-        if (logger.isTraceEnabled()){
-            logger.trace(doc.toString());
+        while (doc == null) {
+            try {
+                logger.info("Initialize doc for : " + site.getUrl());
+                doc = Jsoup.connect(site.getURLString()).get();
+                siteDocumentMap.put(site, doc);
+                if (doc == null) {
+                    logger.error("Document initialization failed. Wait 3 sec and trying again");
+                    Thread.sleep(3000);
+                }
+                if (logger.isTraceEnabled()) logger.trace(doc.toString());
+
+            }catch (IOException e) {
+                logger.error(e);
+            } catch (InterruptedException e) {
+                logger.error(e);
+            }
         }
         return doc;
     }

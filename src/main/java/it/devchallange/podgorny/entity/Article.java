@@ -145,4 +145,8 @@ public class Article implements Entity {
     public Site getSite() {
         return site;
     }
+    public void setSite(Site site) {
+        this.site = site;
+    }
+
 }

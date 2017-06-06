@@ -37,7 +37,8 @@ public class SimpleSiteProcessorImpl implements SimpleSiteProcessor {
     }
 
     @PostConstruct
-    private void startReading(){
+    private void startReading()
+    {
         read();
     }
 
@@ -50,12 +51,13 @@ public class SimpleSiteProcessorImpl implements SimpleSiteProcessor {
     @Override
     public void read() {
         logger.info("Starting...");
+        if (currentStatus == null) resume(); // to set init status
         ExecutorService threadPoolExecutor = Executors.newFixedThreadPool(10);
         for(Map.Entry<Site, SimpleSiteDataGrabber> entry : grabberMap.entrySet()){
             threadPoolExecutor.submit(() -> {
                 Site site = entry.getKey();
                 SimpleSiteDataGrabber grabber = entry.getValue();
-                read(site, grabber, delayBetweenGrabNext);
+                read(site, site, grabber, delayBetweenGrabNext);
             });
         }
     }
@@ -89,7 +91,7 @@ public class SimpleSiteProcessorImpl implements SimpleSiteProcessor {
         Set<Article> articles = articleDAOService.getAll();
         for(Article article : articles){
             logger.info("Renewing " + article.getURL());
-            renewArticle(new Site(article.getSite().getName(), article.getURL()), grabberMap.get(article.getSite()), delayBetweenGrabNext);
+            renewArticle(article.getSite(), new Site(article.getSite().getName(), article.getURL()), grabberMap.get(article.getSite()), delayBetweenGrabNext);
         }
         resume();
     }
@@ -99,16 +101,17 @@ public class SimpleSiteProcessorImpl implements SimpleSiteProcessor {
         pause();
         Article article = articleDAOService.getEntityById(id);
         logger.info("Renewing " + article.getURL());
-        renewArticle(new Site(article.getSite().getName(), article.getURL()), grabberMap.get(article.getSite()), delayBetweenGrabNext);
+        renewArticle(article.getSite(), new Site(article.getSite().getName(), article.getURL()), grabberMap.get(article.getSite()), delayBetweenGrabNext);
         resume();
     }
-    private void renewArticle(Site site, SimpleSiteDataGrabber grabber, long delayBetweenGrabNext){
+    private void renewArticle(final Site root, Site site, SimpleSiteDataGrabber grabber, long delayBetweenGrabNext){
         List<Article> articleList = (List<Article>) grabber.grab(site, delayBetweenGrabNext);
-        insertToDB(articleList);
-        read(grabber.nextPage(site), grabber, delayBetweenGrabNext);
+        insertToDB(articleList, root);
+        read(root, grabber.nextPage(site), grabber, delayBetweenGrabNext);
     }
 
-    private void read(Site site, SimpleSiteDataGrabber grabber, long delayBetweenGrabNext){
+    private void read(final Site root, Site site, SimpleSiteDataGrabber grabber, long delayBetweenGrabNext){
+        logger.info("Start read " + site.getURLString() + ", status=" + currentStatus);
         while (currentStatus != readerStatus.RUNNING){
             try {
                 Thread.sleep(5000);
@@ -118,8 +121,8 @@ public class SimpleSiteProcessorImpl implements SimpleSiteProcessor {
             }
         }
         List<Article> articleList = (List<Article>) grabber.grab(site, delayBetweenGrabNext);
-        insertToDB(articleList);
-        read(grabber.nextPage(site), grabber, delayBetweenGrabNext);
+        insertToDB(articleList, root);
+        read(root, grabber.nextPage(site), grabber, delayBetweenGrabNext);
     }
 
     private readerStatus checkStatus() {
@@ -129,9 +132,10 @@ public class SimpleSiteProcessorImpl implements SimpleSiteProcessor {
         return readerStatus.RUNNING;
     }
 
-    private synchronized void insertToDB(List<Article> articleList){
+    private synchronized void insertToDB(List<Article> articleList, Site root){
         logger.info("Insertint to DB list of Article");
         logger.info(articleList.get(0).getCategory().getName());
+        articleList.forEach((i) -> i.setSite(root));
         articleDAOService.insert(new HashSet<>(articleList));
     }
 }

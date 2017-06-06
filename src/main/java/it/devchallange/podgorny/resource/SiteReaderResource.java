@@ -1,13 +1,9 @@
 package it.devchallange.podgorny.resource;
 
-import it.devchallange.podgorny.dao.DAOService;
-import it.devchallange.podgorny.entity.Title;
 import it.devchallange.podgorny.http.SimpleSiteProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Set;
 
 @RestController
 public class SiteReaderResource {

@@ -75,12 +75,13 @@
     </bean>
 
     <bean id="siteReader"
-          class="it.devchallange.podgorny.http.impl.SimpleSiteProcessorImpl">
+          class="it.devchallange.podgorny.http.impl.SimpleSiteProcessorImpl"
+          lazy-init="true">
         <constructor-arg name="grabberMap">
             <map>
                 <entry key-ref="habrahabrSite" value-ref="habrahabrDataGrabber"/>
             </map>
         </constructor-arg>
-        <constructor-arg name="delayBetweenGrabNext" value="10000"/>
+        <constructor-arg name="delayBetweenGrabNext" value="3500"/>
     </bean>
 </beans>

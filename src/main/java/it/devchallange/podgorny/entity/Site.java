@@ -16,7 +16,7 @@ import java.util.Map;
 @XmlRootElement(name = "site")
 @XmlAccessorType(XmlAccessType.NONE)
 public class Site implements Entity, SimpleSite {
-    private static final Logger logger = Logger.getLogger(Content.class);
+    private static final Logger logger = Logger.getLogger(Site.class);
 
     @XmlElement(name = "id")
     private long id;
@@ -41,6 +41,12 @@ public class Site implements Entity, SimpleSite {
         this.url = convertToURL(url);
     }
 
+    public Site(String name, String url, Map<String, String> replacements) {
+        this.name = name;
+        this.url = convertToURL(url);
+        this.replacements = replacements;
+    }
+
     public Site(String name, URL url, Map<String, String> replacements) {
         this.name = name;
         this.url = url;
@@ -49,6 +55,7 @@ public class Site implements Entity, SimpleSite {
 
     public String getURLString(){
         String sURL = url.getProtocol() + "://" + url.getHost() + url.getPath();
+        logger.info("String URL:" + sURL + ", replacement:" + replacements);
         if (replacements != null) {
             for (String s : replacements.keySet()) {
                 sURL = sURL.replace(s, replacements.get(s));
